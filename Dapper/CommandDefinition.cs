@@ -109,6 +109,8 @@ namespace Dapper
 
         internal IDbCommand SetupCommand(IDbConnection cnn, Action<IDbCommand, object> paramReader)
         {
+			//GlobalHooks.BeforeCommandConstruction(cnn, CommandText, CommandTimeout, ...);
+			
             var cmd = cnn.CreateCommand();
             var init = GetInit(cmd.GetType());
             init?.Invoke(cmd);
@@ -126,6 +128,9 @@ namespace Dapper
             if (CommandType.HasValue)
                 cmd.CommandType = CommandType.Value;
             paramReader?.Invoke(cmd, Parameters);
+			
+			GlobalHooks.AfterCommandConstruction(cmd);
+			
             return cmd;
         }
 
